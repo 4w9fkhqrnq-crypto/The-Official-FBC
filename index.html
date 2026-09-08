@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mijn Website</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-header">
+  <nav class="navbar" aria-label="Hoofdmenu">
+    <a class="brand" href="index.html">The Official FBC</a>
+    <button class="nav-toggle" aria-label="menu" aria-expanded="false">☰</button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="teller.html">De Teller</a></li>
+      <li><a href="over.html">Over</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="home-title">
+    <h1 id="home-title">Welkom op Mijn Website</h1>
+    <p>Gebruik het menu om door de site te navigeren. Wil je de teller gebruiken om fatbikes te tellen, klik dan hieronder.</p>
+    <p><a href="teller.html" class="button">Ga naar De Teller →</a></p>
+  </section>
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
+    <p>&copy; 2025 Mijn Website</p>
+  </div>
+</footer>
+
+<script>
+  const toggle = document.querySelector('.nav-toggle');
+  const links = document.querySelector('.nav-links');
+  toggle?.addEventListener('click', () => {
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!expanded));
+    links.classList.toggle('open');
+  });
+</script>
+</body>
+</html>

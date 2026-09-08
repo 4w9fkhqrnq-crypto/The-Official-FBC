@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>De Teller - Mijn Website</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="site-header">
+  <nav class="navbar" aria-label="Hoofdmenu">
+    <a class="brand" href="index.html">The Official FBC</a>
+
+    <!-- nieuw: gecentreerde tekst tussen merk en links -->
+    <div class="nav-center" aria-hidden="true">Fatbike counters</div>
+
+    <button class="nav-toggle" aria-label="menu" aria-expanded="false">☰</button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="teller.html">De Teller</a></li>
+      <li><a href="over.html">Over</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+
+    <!-- account dropdown (positie via CSS) -->
+    <div class="auth-wrapper" id="authHeader">
+      <button id="authToggle" class="auth-toggle" aria-expanded="false" aria-controls="authPanel">Account ▾</button>
+      <div id="authPanel" class="auth-panel" hidden>
+        <div class="auth-tabs">
+          <button class="tab active" data-target="signin-form">Inloggen</button>
+          <button class="tab" data-target="signup-form">Registreren</button>
+        </div>
+        <div class="auth-forms">
+          <form id="signin-form" class="auth-form active">
+            <input type="email" id="signInEmail" placeholder="E‑mail" required />
+            <input type="password" id="signInPass" placeholder="Wachtwoord" required />
+            <button type="submit">Inloggen</button>
+          </form>
+
+          <form id="signup-form" class="auth-form">
+            <input type="email" id="signUpEmail" placeholder="E‑mail" required />
+            <input type="password" id="signUpPass" placeholder="Wachtwoord" required />
+            <button type="submit">Maak account</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <!-- H1 verwijderd zodat alleen de gecentreerde tekst in de navbar zichtbaar blijft -->
+
+  <div style="max-width:1100px;margin:0 auto;padding:0 1rem 1rem;">
+    <div id="userInfo"></div>
+    <button id="signOutBtn" hidden>Uitloggen</button>
+  </div>
+  <!-- loginHint zichtbaar voor niet-ingelogde bezoekers -->
+  <div id="loginHint" style="max-width:1100px;margin:0 auto;padding:1rem; text-align:center;">
+    <em>Log in om de tellers en grafiek te gebruiken.</em>
+  </div>
+
+  <!-- AUTH-REQUIRED: alles wat pas zichtbaar moet zijn ná inloggen -->
+  <div id="authArea" class="auth-required" aria-hidden="true">
+    <section class="counters-grid" aria-label="Tellers">
+      <div class="counter-card" aria-labelledby="label-a">
+        <h2 id="label-a">Fatbikes</h2>
+        <div id="countA" class="count-display" aria-live="polite">0</div>
+        <div class="counter-controls">
+          <button id="decrA">-1</button>
+          <button id="incrA">+1</button>
+          <button id="resetA">Reset</button>
+        </div>
+      </div>
+
+      <div class="counter-card" aria-labelledby="label-b">
+        <h2 id="label-b">Fietsen</h2>
+        <div id="countB" class="count-display" aria-live="polite">0</div>
+        <div class="counter-controls">
+          <button id="decrB">-1</button>
+          <button id="incrB">+1</button>
+          <button id="resetB">Reset</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vergelijkingsgrafiek -->
+    <section class="chart" aria-labelledby="chart-title">
+      <h2 id="chart-title">Vergelijking tellers</h2>
+      <p class="chart-meta">Balken bewegen realtime mee met jouw tellers.</p>
+
+      <div class="chart-area" role="img" aria-label="Vergelijking van teller A en B">
+        <div class="bars-group">
+          <div class="bar-group">
+            <div class="bar-label" id="labelAvis">Links</div>
+            <div class="bar-track"><div id="barFillA" class="bar-vertical" style="height:0%"></div></div>
+            <div id="barValueA" class="bar-number">0</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar-label" id="labelBvis">Rechts</div>
+            <div class="bar-track"><div id="barFillB" class="bar-vertical" style="height:0%"></div></div>
+            <div id="barValueB" class="bar-number">0</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
+    <p>&copy; 2025 The Official FBC</p>
+  </div>
+</footer>
+
+<script type="module">
+  import { auth, db } from './firebase-config.js';
+  import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+  import { doc, getDoc, onSnapshot, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+  // UI refs
+  const userInfo = document.getElementById('userInfo');
+  const signOutBtn = document.getElementById('signOutBtn');
+  const signinForm = document.getElementById('signin-form');
+  const signupForm = document.getElementById('signup-form');
+
+  const displayA = document.getElementById('countA');
+  const displayB = document.getElementById('countB');
+  const incrA = document.getElementById('incrA');
+  const decrA = document.getElementById('decrA');
+  const resetA = document.getElementById('resetA');
+  const incrB = document.getElementById('incrB');
+  const decrB = document.getElementById('decrB');
+  const resetB = document.getElementById('resetB');
+
+  const barFillA = document.getElementById('barFillA');
+  const barFillB = document.getElementById('barFillB');
+  const barValueA = document.getElementById('barValueA');
+  const barValueB = document.getElementById('barValueB');
+  // Keep label text as user-edited
+  const labelLeft = document.getElementById('label-a')?.textContent || 'Teller A';
+  const labelRight = document.getElementById('label-b')?.textContent || 'Teller B';
+  document.getElementById('labelAvis').textContent = labelLeft;
+  document.getElementById('labelBvis').textContent = labelRight;
+
+  // helper: update chart display
+  function updateChartValues(a, b) {
+    const max = Math.max(1, a, b);
+    const pctA = Math.round((a / max) * 100);
+    const pctB = Math.round((b / max) * 100);
+    if (barFillA) barFillA.style.height = pctA + '%';
+    if (barFillB) barFillB.style.height = pctB + '%';
+    if (barValueA) barValueA.textContent = String(a);
+    if (barValueB) barValueB.textContent = String(b);
+  }
+
+  // local fallback keys and helpers (still used only to show read-only guest values)
+  const fallbackKeyA = 'fatbikeCountA';
+  const fallbackKeyB = 'fatbikeCountB';
+  function readFallback() {
+    const a = Number(localStorage.getItem(fallbackKeyA) || 0);
+    const b = Number(localStorage.getItem(fallbackKeyB) || 0);
+    if (displayA) displayA.textContent = String(a);
+    if (displayB) displayB.textContent = String(b);
+    updateChartValues(a, b);
+  }
+
+  // Setup firestore-backed handlers for logged-in user
+  function setupUserHandlers(uid) {
+    const ref = doc(db, 'users', uid);
+    getDoc(ref).then(snap => {
+      if (!snap.exists()) setDoc(ref, { countA: 0, countB: 0 });
+    }).catch(() => {});
+
+    // realtime listener
+    const unsub = onSnapshot(ref, snap => {
+      const data = snap.data() || { countA: 0, countB: 0 };
+      const latestA = Number(data.countA || 0);
+      const latestB = Number(data.countB || 0);
+      if (displayA) displayA.textContent = String(latestA);
+      if (displayB) displayB.textContent = String(latestB);
+      updateChartValues(latestA, latestB);
+    });
+
+    // safer handlers: lees huidige waarde uit DOM en schrijf naar Firestore
+    const safeUpdate = async (patch) => {
+      try {
+        await updateDoc(ref, patch);
+      } catch (err) {
+        console.error('Update failed:', err);
+        alert('Kon teller niet bijwerken: ' + (err.message || err));
+      }
+    };
+
+    incrA.onclick = () => {
+      const cur = Number(displayA?.textContent || 0);
+      safeUpdate({ countA: cur + 1 });
+    };
+    decrA.onclick = () => {
+      const cur = Number(displayA?.textContent || 0);
+      safeUpdate({ countA: Math.max(0, cur - 1) });
+    };
+    resetA.onclick = () => safeUpdate({ countA: 0 });
+
+    incrB.onclick = () => {
+      const cur = Number(displayB?.textContent || 0);
+      safeUpdate({ countB: cur + 1 });
+    };
+    decrB.onclick = () => {
+      const cur = Number(displayB?.textContent || 0);
+      safeUpdate({ countB: Math.max(0, cur - 1) });
+    };
+    resetB.onclick = () => safeUpdate({ countB: 0 });
+
+    return unsub;
+  }
+
+  // Auth flows
+  signupForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('signUpEmail').value;
+    const pass = document.getElementById('signUpPass').value;
+    try {
+      await createUserWithEmailAndPassword(auth, email, pass);
+      signupForm.reset();
+    } catch (err) {
+      alert('Fout bij registreren: ' + (err.message || err));
+    }
+  });
+
+  signinForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('signInEmail').value;
+    const pass = document.getElementById('signInPass').value;
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+      signinForm.reset();
+    } catch (err) {
+      alert('Fout bij inloggen: ' + (err.message || err));
+    }
+  });
+
+  signOutBtn?.addEventListener('click', async () => {
+    await signOut(auth);
+  });
+
+  // Manage auth state: show authArea only when logged in
+  const authArea = document.getElementById('authArea');
+  const loginHint = document.getElementById('loginHint');
+  let currentUnsub = null;
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      userInfo.textContent = `Ingelogd als ${user.email}`;
+      signOutBtn.hidden = false;
+
+      // show UI
+      authArea?.classList.add('visible');
+      if (authArea) authArea.removeAttribute('aria-hidden');
+      loginHint?.classList.add('hidden');
+
+      if (currentUnsub) { currentUnsub(); currentUnsub = null; }
+      currentUnsub = setupUserHandlers(user.uid);
+    } else {
+      userInfo.textContent = '';
+      signOutBtn.hidden = true;
+
+      // hide UI
+      authArea?.classList.remove('visible');
+      if (authArea) authArea.setAttribute('aria-hidden', 'true');
+      loginHint?.classList.remove('hidden');
+
+      if (currentUnsub) { currentUnsub(); currentUnsub = null; }
+
+      // disable buttons for guests (show alert)
+      const buttons = ['incrA','decrA','resetA','incrB','decrB','resetB'];
+      buttons.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+          btn.onclick = (e) => { e.preventDefault(); alert('Log in om de teller te gebruiken.'); };
+        }
+      });
+
+      // optionally show local read-only values
+      readFallback();
+    }
+  });
+
+  // nav toggle
+  const toggle = document.querySelector('.nav-toggle');
+  const links = document.querySelector('.nav-links');
+  toggle?.addEventListener('click', () => {
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!expanded));
+    links.classList.toggle('open');
+  });
+
+  // auth dropdown UI (tabs & toggle)
+  const authToggle = document.getElementById('authToggle');
+  const authPanel = document.getElementById('authPanel');
+  const tabs = Array.from(document.querySelectorAll('.auth-tabs .tab'));
+  const forms = Array.from(document.querySelectorAll('.auth-form'));
+
+  authToggle?.addEventListener('click', () => {
+    const open = authPanel.hasAttribute('hidden') === false;
+    authToggle.setAttribute('aria-expanded', String(!open));
+    if (open) authPanel.setAttribute('hidden', '');
+    else authPanel.removeAttribute('hidden');
+  });
+
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      const target = btn.getAttribute('data-target');
+      forms.forEach(f => {
+        if (f.id === target) f.classList.add('active');
+        else f.classList.remove('active');
+      });
+    });
+  });
+
+  // set initial display (guest)
+  readFallback();
+</script>
+</body>
+</html>

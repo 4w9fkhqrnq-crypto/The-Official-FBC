@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact - Mijn Website</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-header">
+  <nav class="navbar" aria-label="Hoofdmenu">
+    <a class="brand" href="index.html">Mijn Website</a>
+    <button class="nav-toggle" aria-label="menu" aria-expanded="false">☰</button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="teller.html">De Teller</a></li>
+      <li><a href="over.html">Over</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <h1>Contact</h1>
+  <p>Stuur een bericht of mail naar <a href="mailto:info@example.com">info@example.com</a>.</p>
+
+  <form id="contact-form">
+    <label>
+      Naam<br>
+      <input type="text" name="naam" placeholder="Jouw naam" required>
+    </label>
+    <br><br>
+    <label>
+      E‑mail<br>
+      <input type="email" name="email" placeholder="naam@voorbeeld.nl" required>
+    </label>
+    <br><br>
+    <label>
+      Bericht<br>
+      <textarea name="bericht" rows="5" placeholder="Schrijf je bericht..." required></textarea>
+    </label>
+    <br><br>
+    <button type="submit">Verstuur (demo)</button>
+  </form>
+
+  <div id="form-result" aria-live="polite" style="margin-top:1rem"></div>
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
+    <p>&copy; 2025 Mijn Website</p>
+  </div>
+</footer>
+
+<script>
+  // nav toggle
+  const toggle = document.querySelector('.nav-toggle');
+  const links = document.querySelector('.nav-links');
+  toggle?.addEventListener('click', () => {
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!expanded));
+    links.classList.toggle('open');
+  });
+
+  // demo form submit (no server) — laat resultaat zien
+  const form = document.getElementById('contact-form');
+  const result = document.getElementById('form-result');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    result.textContent = 'Dank — je bericht is verzonden (demo).';
+    form.reset();
+  });
+</script>
+</body>
+</html>

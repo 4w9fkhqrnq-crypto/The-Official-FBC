@@ -1,0 +1,357 @@
+/* Global reset & layout */
+* { box-sizing: border-box; }
+html,body { height: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: #f7f7f7;
+  color: #222;
+  line-height: 1.45;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* Containers */
+.container, .navbar { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+
+/* Header / navbar */
+.site-header {
+  background: #ffffff;
+  border-bottom: 1px solid #e6e6e6;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .75rem 0;
+  position: relative;
+}
+.brand {
+  color: #0066cc;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 1.05rem;
+}
+
+/* Nav links */
+.nav-links {
+  display: flex;
+  gap: .75rem;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.nav-links li a {
+  display: inline-block;
+  color: #222;
+  text-decoration: none;
+  padding: .45rem .7rem;
+  border-radius: 6px;
+  transition: background .12s, color .12s;
+}
+.nav-links li a:hover,
+.nav-links li a:focus {
+  background: #f0f6ff;
+  color: #0066cc;
+  outline: none;
+}
+
+/* Button-looking links */
+.button {
+  background: #0066cc;
+  color: #fff;
+  padding: .5rem .9rem;
+  border-radius: 8px;
+  text-decoration: none;
+}
+.button:hover { opacity: .95; }
+
+/* Hamburger toggle */
+.nav-toggle {
+  display: none;
+  background: none;
+  border: 0;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+/* Main/hero */
+.hero { padding: 3rem 1rem; max-width: 1100px; margin: 0 auto; }
+
+/* Counter (teller) */
+.counter { margin-top: 1rem; }
+.count-display { font-size: 2rem; margin: .75rem 0; }
+.counter-controls button {
+  padding: .45rem .7rem;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+}
+.counter-controls button:hover { background:#f8f8f8; }
+
+/* twee tellers naast elkaar */
+.counters-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  max-width: 1100px;
+  margin: 1rem auto;
+  padding: 0 1rem;
+}
+.counter-card {
+  background: #fff;
+  border: 1px solid #e9e9e9;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.04);
+}
+.counter-card h2 { margin: 0 0 .5rem; font-size: 1.05rem; color: #333; }
+.count-display { font-size: 2rem; margin: .5rem 0; font-weight: 600; }
+.counter-controls { display:flex; gap:.5rem; align-items:center; }
+
+/* grafiek / staafdiagram */
+.chart { max-width:1100px; margin:1.25rem auto; padding:0 1rem; }
+.chart-meta { color:#555; margin: .25rem 0 .75rem; }
+
+.chart-area { background: transparent; padding: .5rem 0; }
+.bars-group {
+  display:flex;
+  gap:1.25rem;
+  align-items:flex-end;
+  justify-content:center;
+  padding: .75rem 0;
+  max-width:640px;
+  margin:0 auto;
+}
+.bar-group { display:flex; flex-direction:column; align-items:center; width:140px; }
+.bar-label { font-weight:600; color:#222; margin-bottom:.6rem; text-align:center; }
+.bar-track {
+  width:100%;
+  height:220px;
+  background: linear-gradient(180deg,#f6f9fb,#eef3f6);
+  border-radius:10px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.04);
+  display:flex;
+  align-items:flex-end;
+  padding:6px;
+  overflow:hidden;
+}
+.bar-vertical {
+  width:60%;
+  height:0%;
+  background: linear-gradient(180deg,#00a1ff 0%,#005bb5 100%);
+  border-radius:8px 8px 0 0;
+  transition: height 420ms cubic-bezier(.2,.9,.3,1), background 220ms;
+  margin:0 auto;
+}
+.bar-number { margin-top:.5rem; font-weight:700; color:#0066cc; }
+
+/* specifieke kleuren voor de vergelijkingsgrafiek */
+#barFillA {
+  background: linear-gradient(180deg, #000000 0%, #222222 100%); /* Fatbikes = zwart */
+}
+#barFillB {
+  background: linear-gradient(180deg, #0077e6 0%, #004fa3 100%); /* Fietsen = blauw */
+}
+
+/* optioneel: waarden / labels kleuren per teller */
+#barValueA { color: #000000; }
+#barValueB { color: #0066cc; }
+#labelAvis { color: #000000; }
+#labelBvis { color: #0066cc; }
+
+/* legend / helper */
+.chart-legend { text-align:center; color:#666; margin-top:.5rem; font-size:.9rem; }
+
+/* twee kolommen op grotere schermen */
+@media (min-width: 780px) {
+  .bars { grid-template-columns: 1fr 1fr; }
+}
+
+/* responsive: onder elkaar op kleine schermen */
+@media (max-width: 720px) {
+  .nav-toggle { display: block; }
+  .nav-links {
+    position: absolute;
+    right: 1rem;
+    top: 62px;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #e6e6e6;
+    padding: .5rem;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    display: none;
+    min-width: 180px;
+    gap: .25rem;
+    border-radius: 8px;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links li a { padding: .5rem .75rem; white-space: nowrap; }
+  .counters-grid { grid-template-columns: 1fr; }
+}
+
+/* auth dropdown */
+.auth-wrapper {
+  position: absolute;
+  right: 1rem;
+  top: calc(100% + 0.5rem); /* direct onder de navbar */
+  z-index: 60;
+  display: flex;
+  align-items: center;
+}
+.auth-wrapper { max-width: 700px; margin: .75rem auto; padding: 0 1rem; position: relative; }
+.auth-toggle {
+  display:inline-block;
+  background:#fff;
+  border:1px solid #e6e6e6;
+  padding:.45rem .75rem;
+  border-radius:8px;
+  cursor:pointer;
+}
+.auth-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.4rem); /* net onder de knop */
+  min-width: 260px;
+  max-width: 360px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  border-radius: 10px;
+  padding: .6rem;
+  background: #fff;
+}
+.auth-panel {
+  margin-top:.5rem;
+  background:#fff;
+  border:1px solid #e6e6e6;
+  border-radius:10px;
+  padding:.75rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}
+.auth-tabs { display:flex; gap:.5rem; margin-bottom:.5rem; }
+.tab {
+  border:0; background:transparent; padding:.4rem .6rem; cursor:pointer; border-radius:6px;
+  color:#333; font-weight:600;
+}
+.tab.active { background:#f0f6ff; color:#0066cc; }
+.auth-forms { display:flex; gap:1rem; flex-wrap:wrap; }
+.auth-form { flex:1 1 240px; display:none; }
+.auth-form.active { display:block; }
+.auth-form input { width:100%; padding:.45rem .5rem; margin:.4rem 0; border-radius:6px; border:1px solid #ddd; }
+.auth-form button { padding:.45rem .8rem; border-radius:8px; background:#0066cc; color:#fff; border:0; cursor:pointer; }
+
+/* smaller screens */
+@media (max-width: 640px) {
+  .auth-forms { flex-direction:column; }
+  .tab { flex:1; text-align:center; }
+}
+
+/* Accessibility focus */
+a:focus, button:focus, input:focus, textarea:focus {
+  outline: 3px solid rgba(0,102,204,0.18);
+  outline-offset: 2px;
+}
+
+/* plaats account-knop rechts onder het menu (desktop) */
+.navbar { position: relative; }
+
+/* gecentreerde navbar-tekst tussen brand en links */
+.navbar { position: relative; }
+
+.nav-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 600;
+  color: #222;
+  font-size: 1rem;
+  white-space: nowrap;
+  pointer-events: none; /* voorkomt dat het per ongeluk klikbaar is */
+}
+
+/* op kleine schermen verberg de gecentreerde tekst zodat de layout geen problemen geeft */
+@media (max-width: 720px) {
+  .nav-center { display: none; }
+}
+
+/* wrapper direct onder de navbar en rechts uitgelijnd */
+.auth-wrapper {
+  position: absolute;
+  right: 1rem;
+  top: calc(100% + 0.5rem); /* direct onder de navbar */
+  z-index: 60;
+  display: flex;
+  align-items: center;
+}
+
+/* panel staat onder de knop, relatief aan de wrapper */
+.auth-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.4rem); /* net onder de knop */
+  min-width: 260px;
+  max-width: 360px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  border-radius: 10px;
+  padding: .6rem;
+  background: #fff;
+}
+
+/* mobiel: statische layout onder de navbar */
+@media (max-width: 720px) {
+  .auth-wrapper {
+    position: static;
+    transform: none;
+    margin-top: .5rem;
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .auth-panel {
+    position: static;
+    width: 100%;
+    box-shadow: none;
+    border-radius: 8px;
+    margin-top: .5rem;
+  }
+}
+
+/* verberg teller-ui standaard; zichtbaar zodra class .visible toegevoegd wordt */
+.auth-required { display: none; }
+.auth-required.visible { display: block; }
+
+#loginHint { display: block; color: #444; }
+#loginHint.hidden { display: none; }
+
+/* Copyright fixed left-bottom */
+.site-footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  background: rgba(255,255,255,0.95); /* licht achtergrond zodat tekst leesbaar blijft */
+  border-top: 1px solid #eee;
+  padding: .45rem .75rem;
+  z-index: 90;
+  width: auto;
+}
+
+.site-footer .container {
+  max-width: none;
+  padding: 0;
+}
+
+.site-footer p {
+  margin: 0;
+  color: #444;
+  font-size: .95rem;
+}
+
+/* Zorg dat content niet onder de vaste footer valt */
+body {
+  padding-bottom: 3.25rem; /* pas aan als footer hoger wordt */
+}
